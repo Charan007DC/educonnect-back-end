@@ -39,3 +39,21 @@ exports.loginAdmin = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+exports.getAdminDashboard = async (req, res) => {
+  try {
+    // Dummy data — Replace with DB queries if needed
+    const dashboardData = {
+      totalUsers: 120,
+      activeAlumni: 45,
+      mentorshipRequests: 8,
+      reports: 3
+    };
+
+    res.status(200).json({
+      message: 'Admin dashboard data fetched successfully',
+      dashboard: dashboardData
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to load dashboard', error: err.message });
+  }
+};
