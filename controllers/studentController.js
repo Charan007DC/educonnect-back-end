@@ -1,9 +1,10 @@
 const Student = require('../models/student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 // Register a student
 exports.registerStudent = async (req, res) => {
-  const { name, register_no, email, password, year, semester, description } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     const existingStudent = await Student.findOne({ email });
@@ -15,12 +16,22 @@ exports.registerStudent = async (req, res) => {
 
     const newStudent = new Student({
       name,
-      register_no,
       email,
       password: hashedPassword,
-      year,
-      semester,
-      description
+
+      // Leave all other fields as default/empty
+      profilePicture: '',
+      graduationYear: null,
+      institution: '',
+      location: '',
+      description: '',
+      about: '',
+      academicInterests: [],
+      skills: [],
+      projects: [],
+      fundraisingCampaigns: [],
+      lookingFor: [],
+      role: 'Student'
     });
 
     await newStudent.save();
@@ -57,9 +68,10 @@ exports.loginStudent = async (req, res) => {
       token,
       student: {
         id: student._id,
-        name: student.name,
         email: student.email,
-        year: student.year
+        name: student.name,
+        description: student.description,
+        profilePicture: student.profilePicture
       }
     });
   } catch (err) {
