@@ -2,7 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const studentRoutes = require('./routes/studentRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
-const adminRoutes = require('./routes/admin');
+const adminRoutes = require('./routes/adminRoutes');
 dotenv.config();
 
 const app = express();
