@@ -1,10 +1,10 @@
+dotenv.config();
 const express = require('express');
 const dotenv = require('dotenv');
 const studentRoutes = require('./routes/studentRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
-dotenv.config();
 
 const app = express();
 app.use(express.json());
