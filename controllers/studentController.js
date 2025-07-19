@@ -1,6 +1,7 @@
 const Student = require('../models/student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 // Register a student
 exports.registerStudent = async (req, res) => {
@@ -84,19 +85,32 @@ exports.loginStudent = async (req, res) => {
 exports.updateProfilePicture = async (req, res) => {
   try {
     const studentId = req.user.id;
-    const photoUrl = req.file.path;
 
+    // Check if file was uploaded
+    if (!req.file || !req.file.path) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const photoUrl = req.file.path; // This is the Cloudinary URL
+
+    // Update profilePicture field in MongoDB
     const student = await Student.findByIdAndUpdate(
       studentId,
       { profilePicture: photoUrl },
       { new: true }
     );
 
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+
     res.status(200).json({
       message: 'Profile picture updated successfully',
-      profilePicture: student.profilePicture,
+      profilePicture: student.profilePicture
     });
-  } catch (err) {
-    res.status(500).json({ message: 'Error uploading photo', error: err.message });
+
+  } catch (error) {
+    console.error('Error updating profile picture:', error);
+    res.status(500).json({ message: 'Error uploading photo', error: error.message });
   }
 };
