@@ -83,7 +83,6 @@ exports.loginStudent = async (req, res) => {
 // Update profile picture
 exports.updateProfilePicture = async (req, res) => {
   try {
-    const studentId = req.user.id;
     const photoUrl = req.file.path;
 
     const student = await Student.findByIdAndUpdate(
