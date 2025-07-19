@@ -4,9 +4,11 @@ const Alumni = require("../models/alumni");
 
 // Alumni Registration
 exports.registerAlumni = async (req, res) => {
-  try {
-    const { name, email, password, batch, department } = req.body;
-
+  const { name, email, password ,graduationYear,institution,department } = req.body;
+    if (!name || !email || !password || !graduationYear || !institution || !department) {
+  return res.status(400).json({ message: 'All fields are required' }); 
+  }
+  try {    
     // Check if email already exists
     const existingAlumni = await Alumni.findOne({ email });
     if (existingAlumni) {
@@ -21,8 +23,21 @@ exports.registerAlumni = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      batch,
+      graduationYear,
       department,
+      institution,
+      // Default values for other fields
+      currentCompany: '',
+      jobTitle: '',
+      about: '',
+      profilePicture: '',
+      location: '',
+      description: '',
+      skills: [],
+      projects: [],
+      lookingFor: [],
+      role: 'Alumni'
+
     });
 
     await alumni.save();
