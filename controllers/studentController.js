@@ -113,5 +113,8 @@ exports.updateProfilePicture = async (req, res) => {
   } catch (err) {
     console.error('Error updating profile picture:', err);
     res.status(500).json({ message: 'Error uploading photo', error: err.message });
+    console.log("req.file:", req.file);
+    console.log("req.body:", req.body);
+
   }
 };
