@@ -1,14 +1,14 @@
 const Student = require('../models/student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 
 // Register a student
 exports.registerStudent = async (req, res) => {
-  const { name, email, password ,graduationYear,institution,department } = req.body;
+  const { name, email, password, graduationYear, institution, department } = req.body;
   if (!name || !email || !password || !graduationYear || !institution || !department) {
     return res.status(400).json({ message: 'All fields are required' }); 
   }
+
   try {
     const existingStudent = await Student.findOne({ email });
     if (existingStudent) {
@@ -24,7 +24,6 @@ exports.registerStudent = async (req, res) => {
       graduationYear,
       institution,
       department,
-      // Leave all other fields as default/empty
       profilePicture: '',
       location: '',
       description: '',
@@ -45,7 +44,7 @@ exports.registerStudent = async (req, res) => {
   }
 };
 
-//  Login a student
+// Login a student
 exports.loginStudent = async (req, res) => {
   const { email, password } = req.body;
 
@@ -81,6 +80,7 @@ exports.loginStudent = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
 // Update profile picture
 exports.updateProfilePicture = async (req, res) => {
   try {
@@ -90,7 +90,11 @@ exports.updateProfilePicture = async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const photoUrl = req.file.path; // this will be like "uploads/xyz.jpg"
+    // DEBUGGING: Print file object
+    console.log('File Uploaded:', req.file);
+
+    // Convert backslashes (Windows) to forward slashes (URL safe)
+    const photoUrl = req.file.path.replace(/\\/g, '/');
 
     const student = await Student.findByIdAndUpdate(
       studentId,
