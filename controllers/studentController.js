@@ -1,6 +1,8 @@
 const Student = require('../models/student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
 // Register a student
 exports.registerStudent = async (req, res) => {
@@ -84,37 +86,50 @@ exports.loginStudent = async (req, res) => {
 // Update profile picture
 exports.updateProfilePicture = async (req, res) => {
   try {
-    const studentId = req.user.id;
+    const studentId = req.user._id;
+    const file = req.file;
 
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded.' });
     }
 
-    // DEBUGGING: Print file object
-    console.log('File Uploaded:', req.file);
+    // Use upload_stream + streamifier
+    const streamUpload = (fileBuffer) => {
+      return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'student_profiles',
+            resource_type: 'image',
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        );
+        streamifier.createReadStream(fileBuffer).pipe(stream);
+      });
+    };
 
-    // Convert backslashes (Windows) to forward slashes (URL safe)
-    const photoUrl = req.file.path.replace(/\\/g, '/');
+    const result = await streamUpload(file.buffer);
+    const imageUrl = result.secure_url;
 
+    // Update MongoDB with image URL
     const student = await Student.findByIdAndUpdate(
       studentId,
-      { profilePicture: photoUrl },
+      { profilePicture: imageUrl },
       { new: true }
     );
 
-    if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
-
     res.status(200).json({
-      message: 'Profile picture updated successfully',
-      profilePicture: student.profilePicture,
+      message: 'Profile picture updated successfully.',
+      profilePicture: imageUrl,
+      student,
     });
-  } catch (err) {
-    console.error('Error updating profile picture:', err);
-    res.status(500).json({ message: 'Error uploading photo', error: err.message });
-    console.log("req.file:", req.file);
-    console.log("req.body:", req.body);
-
+  } catch (error) {
+    console.error('Error updating profile picture:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
