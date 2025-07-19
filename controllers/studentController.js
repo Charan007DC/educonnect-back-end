@@ -93,28 +93,7 @@ exports.updateProfilePicture = async (req, res) => {
       return res.status(400).json({ message: 'No file uploaded.' });
     }
 
-    // Use upload_stream + streamifier
-    const streamUpload = (fileBuffer) => {
-      return new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          {
-            folder: 'student_profiles',
-            resource_type: 'image',
-          },
-          (error, result) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(result);
-            }
-          }
-        );
-        streamifier.createReadStream(fileBuffer).pipe(stream);
-      });
-    };
-
-    const result = await streamUpload(file.buffer);
-    const imageUrl = result.secure_url;
+    const imageUrl = file.path; // this is the Cloudinary-hosted image URL
 
     // Update MongoDB with image URL
     const student = await Student.findByIdAndUpdate(
@@ -133,3 +112,4 @@ exports.updateProfilePicture = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
