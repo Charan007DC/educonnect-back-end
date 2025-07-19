@@ -80,3 +80,23 @@ exports.loginStudent = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+// Update profile picture
+exports.updateProfilePicture = async (req, res) => {
+  try {
+    const studentId = req.user.id;
+    const photoUrl = req.file.path;
+
+    const student = await Student.findByIdAndUpdate(
+      studentId,
+      { profilePicture: photoUrl },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: 'Profile picture updated successfully',
+      profilePicture: student.profilePicture,
+    });
+  } catch (err) {
+    res.status(500).json({ message: 'Error uploading photo', error: err.message });
+  }
+};

@@ -36,7 +36,7 @@ exports.registerAlumni = async (req, res) => {
       skills: [],
       projects: [],
       lookingFor: [],
-      role: 'Alumni'
+      
 
     });
 
