@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const studentRoutes = require('./routes/studentRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const studentRoutes = require('./routes/studentRoutes');
 dotenv.config();
 
 const app = express();
