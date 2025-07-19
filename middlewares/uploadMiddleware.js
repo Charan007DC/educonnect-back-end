@@ -4,7 +4,7 @@ const router = express.Router();
 const studentController = require('../controllers/studentController');
 const { verifyStudentToken } = require('../middlewares/verifyStudentToken');
 const multer = require('multer');
-const { storage } = require('../utils/cloudinary');
+const { storage } = require('../config/cloudinary');
 
 const upload = multer({ storage });
 
