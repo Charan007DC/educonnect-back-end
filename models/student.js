@@ -1,21 +1,19 @@
 const mongoose = require('mongoose');
 
 const studentSchema = new mongoose.Schema({
-  name: String,
+  name: {type :String,required: true},
   email: {type :String, required: true, unique: true},
-  password: String, // hashed
+  password:{type : String , required: true }, // hashed
+  institution: {type:String,required: true}, 
+  department: {type:String,required: true},
+  graduationYear:{type : Number,required: true}, 
   profilePicture: String, // URL or base64
   role: { type: String, default: 'Student' },
-  graduationYear: Number,
-  institution: String,
   location: String,
-
   about: String,
-  description: String, // New field for short tagline/bio under name
-
+  description: String, // New field for short tagline/bio under name\
   academicInterests: [String], // e.g., ['AI', 'ML', 'Computer Vision']
   skills: [String],            // e.g., ['Python', 'TensorFlow', 'Git']
-
   projects: [
     {
       title: String,

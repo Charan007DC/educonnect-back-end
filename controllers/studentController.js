@@ -4,8 +4,10 @@ const jwt = require('jsonwebtoken');
 
 // Register a student
 exports.registerStudent = async (req, res) => {
-  const { name, email, password } = req.body;
-
+  const { name, email, password ,graduationYear,institution,department } = req.body;
+  if (!name || !email || !password || !graduationYear || !institution || !department) {
+    return res.status(400).json({ message: 'All fields are required' }); 
+  }
   try {
     const existingStudent = await Student.findOne({ email });
     if (existingStudent) {
@@ -18,11 +20,11 @@ exports.registerStudent = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-
+      graduationYear,
+      institution,
+      department,
       // Leave all other fields as default/empty
       profilePicture: '',
-      graduationYear: null,
-      institution: '',
       location: '',
       description: '',
       about: '',
