@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
 });
 
 const Student = mongoose.model('Student', userSchema, 'students');
-const Alumni = mongoose.model('Alumni', userSchema, 'alumni');
+const Alumni = mongoose.model('Alumni', userSchema, 'alumnis');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
