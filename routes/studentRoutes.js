@@ -14,7 +14,7 @@ router.post('/login', loginStudent);
 router.post('/upload-photo', verifyStudentToken, upload.single('photo'), updateProfilePicture);
 
 // Get student profile (for viewing/editing)
-router.get('/profile', verifyStudentToken, getStudentProfile);
+
 
 // Update student profile (after editing)
 router.put('/profile', verifyStudentToken, updateStudentProfile);
