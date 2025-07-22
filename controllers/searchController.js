@@ -2,37 +2,31 @@ const Student = require('../models/student');
 const Alumni = require('../models/alumni');
 
 exports.searchProfiles = async (req, res) => {
-  const query = req.query.query?.trim();
-  const type = req.query.type; // 'student' or 'alumni'
+  const { type, query } = req.query;
 
-  if (!query || !type) {
-    return res.status(400).json({ message: 'Search query and type are required' });
+  if (!type || !query) {
+    return res.status(400).json({ message: 'Type and query are required' });
+  }
+
+  if (!['student', 'alumni'].includes(type.toLowerCase())) {
+    return res.status(400).json({ message: 'Type must be either student or alumni' });
   }
 
   try {
-    const regex = new RegExp(query, 'i'); // case-insensitive regex
+    const regex = new RegExp(query, 'i'); // fuzzy search: case-insensitive + partial
 
-    const searchConditions = [
-      { name: regex },
-      { email: regex },
-      { department: regex },
-      { institution: regex },
-      { graduationYear: { $regex: regex } },
-    ];
+    const Model = type.toLowerCase() === 'student' ? Student : Alumni;
 
-    if (type === 'student') {
-      const students = await Student.find({ $or: searchConditions }).limit(20);
-      return res.status(200).json({ results: students });
-    }
+    const results = await Model.find({
+      $or: [
+        { name: regex },
+        { email: regex },
+        { department: regex },
+        { graduationYear: regex }
+      ]
+    }).select('_id name email graduationYear department');
 
-    if (type === 'alumni') {
-      // Add location field for alumni
-      const alumniSearch = [...searchConditions, { location: regex }];
-      const alumni = await Alumni.find({ $or: alumniSearch }).limit(20);
-      return res.status(200).json({ results: alumni });
-    }
-
-    return res.status(400).json({ message: 'Invalid type: must be student or alumni' });
+    res.status(200).json({ results });
 
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
