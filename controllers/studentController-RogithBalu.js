@@ -112,4 +112,50 @@ exports.updateProfilePicture = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+// update  student profile
+exports.updateStudentProfile = async (req, res) => {
+  try {
+    const allowedFields = [
+      'name',
+      'location',
+      'description',
+      'about',
+      'academicInterests',
+      'skills',
+      'projects',
+      'fundraisingCampaigns',
+      'lookingFor'
+    ];
+
+    const updates = {};
+    for (const key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        updates[key] = req.body[key];
+      }
+    }
+
+    // Ensure there's at least one valid field
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: 'No valid fields provided for update.' });
+    }
+
+    const updatedStudent = await Student.findByIdAndUpdate(
+      req.user._id,
+      updates,
+      { new: true }
+    ).select('-password'); 
+
+    if (!updatedStudent) {
+      return res.status(404).json({ message: 'Student not found.' });
+    }
+
+    res.status(200).json({
+      message: 'Profile updated successfully.',
+      student: updatedStudent
+    });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
 
