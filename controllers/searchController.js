@@ -1,34 +1,39 @@
 const Student = require('../models/student');
 const Alumni = require('../models/alumni');
 
-exports.searchProfiles = async (req, res) => {
-  const { type, query } = req.query;
-
-  if (!type || !query) {
-    return res.status(400).json({ message: 'Type and query are required' });
-  }
-
-  if (!['student', 'alumni'].includes(type.toLowerCase())) {
-    return res.status(400).json({ message: 'Type must be either student or alumni' });
-  }
-
+const searchProfiles = async (req, res, query) => {
   try {
-    const regex = new RegExp(query, 'i'); // fuzzy search: case-insensitive + partial
+    const { query: searchQuery, type } = query;
+
+    if (!searchQuery || !type || !['student', 'alumni'].includes(type.toLowerCase())) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Invalid or missing query/type' }));
+    }
 
     const Model = type.toLowerCase() === 'student' ? Student : Alumni;
 
+    // Fuzzy match on multiple fields using regex
     const results = await Model.find({
       $or: [
-        { name: regex },
-        { email: regex },
-        { department: regex },
-        { graduationYear: regex }
+        { name: { $regex: searchQuery, $options: 'i' } },
+        { department: { $regex: searchQuery, $options: 'i' } },
+        { institution: { $regex: searchQuery, $options: 'i' } },
+        { location: { $regex: searchQuery, $options: 'i' } },
+        { skills: { $regex: searchQuery, $options: 'i' } },
+        { academicInterests: { $regex: searchQuery, $options: 'i' } },
+        { 'projects.title': { $regex: searchQuery, $options: 'i' } },
+        { 'projects.description': { $regex: searchQuery, $options: 'i' } },
       ]
-    }).select('_id name email graduationYear department');
+    });
 
-    res.status(200).json({ results });
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ results }));
 
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('🔴 Search Controller Error:', err);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Server error' }));
   }
 };
+
+module.exports = searchProfiles;
