@@ -6,7 +6,7 @@ const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const path = require('path');
 const search = require('./routes/search');
-
+const cors = require('cors');
 const app = express();
 app.use(express.json());
 
@@ -16,5 +16,7 @@ app.use('/api/alumni', alumniRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/search',search);
+app.use(cors());
+app.use(express.json());
 
 module.exports = app;
