@@ -1,40 +1,39 @@
 const Student = require('../models/student');
 const Alumni = require('../models/alumni');
 
-exports.searchProfiles = async (req, res) => {
-  const query = req.query.query?.trim();
-  const type = req.query.type; // 'student' or 'alumni'
-
-  if (!query || !type) {
-    return res.status(400).json({ message: 'Search query and type are required' });
-  }
-
+const searchProfiles = async (req, res, query) => {
   try {
-    const regex = new RegExp(query, 'i'); // case-insensitive regex
+    const { query: searchQuery, type } = query;
 
-    const searchConditions = [
-      { name: regex },
-      { email: regex },
-      { department: regex },
-      { institution: regex },
-      { graduationYear: { $regex: regex } },
-    ];
-
-    if (type === 'student') {
-      const students = await Student.find({ $or: searchConditions }).limit(20);
-      return res.status(200).json({ results: students });
+    if (!searchQuery || !type || !['student', 'alumni'].includes(type.toLowerCase())) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Invalid or missing query/type' }));
     }
 
-    if (type === 'alumni') {
-      // Add location field for alumni
-      const alumniSearch = [...searchConditions, { location: regex }];
-      const alumni = await Alumni.find({ $or: alumniSearch }).limit(20);
-      return res.status(200).json({ results: alumni });
-    }
+    const Model = type.toLowerCase() === 'student' ? Student : Alumni;
 
-    return res.status(400).json({ message: 'Invalid type: must be student or alumni' });
+    // Fuzzy match on multiple fields using regex
+    const results = await Model.find({
+      $or: [
+        { name: { $regex: searchQuery, $options: 'i' } },
+        { department: { $regex: searchQuery, $options: 'i' } },
+        { institution: { $regex: searchQuery, $options: 'i' } },
+        { location: { $regex: searchQuery, $options: 'i' } },
+        { skills: { $regex: searchQuery, $options: 'i' } },
+        { academicInterests: { $regex: searchQuery, $options: 'i' } },
+        { 'projects.title': { $regex: searchQuery, $options: 'i' } },
+        { 'projects.description': { $regex: searchQuery, $options: 'i' } },
+      ]
+    });
+
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ results }));
 
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('🔴 Search Controller Error:', err);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Server error' }));
   }
 };
+
+module.exports = searchProfiles;
