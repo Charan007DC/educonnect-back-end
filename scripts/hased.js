@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 
 // Choose your password
-const plainPassword = 'Admin@1234';
+const plainPassword = 'hello wevee ad';
 
 // Hash it
 bcrypt.hash(plainPassword, 10, (err, hashedPassword) => {
