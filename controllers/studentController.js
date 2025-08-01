@@ -174,72 +174,7 @@ exports.updateStudentProfile = async (req, res) => {
   } catch (err) {
     console.error('Error updating profile:', err);
     res.status(500).json({ message: 'Server error', error: err.message });
-  }exports.requestPasswordReset = async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    const student = await Student.findOne({ email });
-    if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    student.otp = otp;
-    student.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-    await student.save();
-
-    const sendMail = require('../utils/sendMail');
-    await sendMail(student.email, 'Your OTP for Password Reset', `Your OTP is: ${otp}`);
-
-    res.status(200).json({ message: 'OTP sent to your email' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
   }
-};
-exports.requestPasswordReset = async (req, res) => {
-  const { email } = req.body;
-
-  try {
-    const student = await Student.findOne({ email });
-    if (!student) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    student.otp = otp;
-    student.otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-    await student.save();
-
-    const sendMail = require('../utils/sendMail');
-    await sendMail(student.email, 'Your OTP for Password Reset', `Your OTP is: ${otp}`);
-
-    res.status(200).json({ message: 'OTP sent to your email' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
-exports.resetPassword = async (req, res) => {
-  const { email, otp, newPassword } = req.body;
-
-  try {
-    const student = await Student.findOne({ email });
-
-    if (!student || student.otp !== otp || Date.now() > student.otpExpires) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
-
-    student.password = await bcrypt.hash(newPassword, 10);
-    student.otp = undefined;
-    student.otpExpires = undefined;
-    await student.save();
-
-    res.status(200).json({ message: 'Password reset successful' });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
-
-
 };
 
 
