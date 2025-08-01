@@ -1,3 +1,4 @@
+console.log("Loading: search.js");
 const express = require('express');
 const router = express.Router();
 const searchProfiles = require('../controllers/searchController');

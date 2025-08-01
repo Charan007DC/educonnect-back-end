@@ -1,3 +1,4 @@
+console.log("Loading: alumniRoutes.js");
 const express = require("express");
 const router = express.Router();
 const { registerAlumni, loginAlumni } = require("../controllers/alumniController");
