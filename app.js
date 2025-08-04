@@ -1,4 +1,3 @@
-// app.js
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -11,12 +10,13 @@ const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/search');
 
 const app = express();
-
+// --- START OF CORRECTIONS ---
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
   process.env.FRONTEND_URL
 ];
+
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -28,11 +28,15 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'],
   credentials: true
 };
+
 app.use(cors(corsOptions));
 app.use(express.json());
+
+
 app.get('/', (req, res) => {
   res.status(200).send('Welcome to the EduConnect API. The app is running!');
 });
+
 app.use('/api/student', studentRoutes);
 app.use('/api/alumni', alumniRoutes);
 app.use('/api/admin', adminRoutes);
