@@ -166,7 +166,6 @@ exports.updateStudentProfile = async (req, res) => {
     if (!updatedStudent) {
       return res.status(404).json({ message: 'Student not found.' });
     }
-
     res.status(200).json({
       message: 'Profile updated successfully.',
       student: updatedStudent
