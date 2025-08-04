@@ -62,7 +62,7 @@ exports.loginStudent = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: student._id },
+      { id: student._id }, // The payload is { id: ... }
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -86,16 +86,17 @@ exports.loginStudent = async (req, res) => {
 // Update profile picture
 exports.updateProfilePicture = async (req, res) => {
   try {
-    const studentId = req.user._id;
+    // Corrected to use req.user.id to match the JWT payload
+    const studentId = req.user.id; 
     const file = req.file;
 
     if (!file) {
       return res.status(400).json({ message: 'No file uploaded.' });
     }
 
-    const imageUrl = file.path; // this is the Cloudinary-hosted image URL
-    const Student = require('../models/studentModel');
-    // Update MongoDB with image URL
+    const imageUrl = file.path;
+    
+    // You don't need to require the model again here
     const student = await Student.findByIdAndUpdate(
       studentId,
       { profilePicture: imageUrl },
@@ -112,13 +113,14 @@ exports.updateProfilePicture = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-//get student profile 
 
+// Get student profile 
 exports.getStudentProfile = async (req, res) => {
   try {
-    const studentId = req.user._id; // This assumes you're using verifyStudentToken middleware
+    // Corrected to use req.user.id
+    const studentId = req.user.id; 
 
-    const student = await Student.findById(studentId).select('-password'); // exclude password
+    const student = await Student.findById(studentId).select('-password');
 
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
@@ -130,19 +132,13 @@ exports.getStudentProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-// update  student profile
+
+// Update student profile
 exports.updateStudentProfile = async (req, res) => {
   try {
     const allowedFields = [
-      'name',
-      'location',
-      'description',
-      'about',
-      'academicInterests',
-      'skills',
-      'projects',
-      'fundraisingCampaigns',
-      'lookingFor'
+      'name', 'location', 'description', 'about', 'academicInterests',
+      'skills', 'projects', 'fundraisingCampaigns', 'lookingFor'
     ];
 
     const updates = {};
@@ -152,13 +148,12 @@ exports.updateStudentProfile = async (req, res) => {
       }
     }
 
-    // Ensure there's at least one valid field
     if (Object.keys(updates).length === 0) {
       return res.status(400).json({ message: 'No valid fields provided for update.' });
     }
 
     const updatedStudent = await Student.findByIdAndUpdate(
-      req.user._id,
+      req.user.id, // Corrected to use req.user.id
       updates,
       { new: true }
     ).select('-password'); 
@@ -176,4 +171,18 @@ exports.updateStudentProfile = async (req, res) => {
   }
 };
 
+exports.getStudentDashboardDetails = async (req, res) => {
+  try {
+    const student = await Student.findById(req.user.id).select('name');
 
+    if (!student) {
+      return res.status(404).json({ message: 'Student not found' });
+    }
+    
+    res.json(student);
+
+  } catch (err) {
+    console.error("Error fetching student dashboard details:", err.message);
+    res.status(500).send('Server Error');
+  }
+};
