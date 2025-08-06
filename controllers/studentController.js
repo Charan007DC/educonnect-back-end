@@ -48,39 +48,45 @@ exports.registerStudent = async (req, res) => {
 
 // Login a student
 exports.loginStudent = async (req, res) => {
-  const { email, password } = req.body;
+  
+    console.log('Backend received login request for:', req.body);
 
-  try {
-    const student = await Student.findOne({ email });
-    if (!student) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+    const { email, password } = req.body;
+
+    try {
+        const student = await Student.findOne({ email });
+        if (!student) {
+            return res.status(400).json({ message: 'Invalid email or password' });
+        }
+
+        const isMatch = await bcrypt.compare(password, student.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid email or password' });
+        }
+
+        const token = jwt.sign(
+            { id: student._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        console.log(`Login successful for ${student.name}. Sending token.`);
+
+        res.status(200).json({
+            message: 'Login successful',
+            token,
+            student: {
+                id: student._id,
+                email: student.email,
+                name: student.name,
+                description: student.description,
+                profilePicture: student.profilePicture
+            }
+        });
+    } catch (err) {
+        console.error("Login server error:", err);
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
-
-    const isMatch = await bcrypt.compare(password, student.password);
-    if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
-    }
-
-    const token = jwt.sign(
-      { id: student._id }, // The payload is { id: ... }
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.status(200).json({
-      message: 'Login successful',
-      token,
-      student: {
-        id: student._id,
-        email: student.email,
-        name: student.name,
-        description: student.description,
-        profilePicture: student.profilePicture
-      }
-    });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
 };
 
 // Update profile picture
