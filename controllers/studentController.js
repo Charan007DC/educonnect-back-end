@@ -48,7 +48,7 @@ exports.registerStudent = async (req, res) => {
 
 // Login a student
 exports.loginStudent = async (req, res) => {
-  
+ 
     console.log('Backend received login request for:', req.body);
 
     const { email, password } = req.body;
