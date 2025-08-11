@@ -8,7 +8,8 @@ const studentRoutes = require('./routes/studentRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/search');
-
+const projectRoutes = require('./routes/projectRoutes');
+const fundraisingRoutes = require('./routes/fundraisingRoutes');
 const app = express();
 // --- START OF CORRECTIONS ---
 const allowedOrigins = [
@@ -42,5 +43,7 @@ app.use('/api/alumni', alumniRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/projects', projectRoutes);
+app.use('/api/fundraising', fundraisingRoutes);
 
 module.exports = app;
