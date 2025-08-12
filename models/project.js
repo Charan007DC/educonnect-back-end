@@ -23,6 +23,23 @@ const projectSchema = new Schema({
         type: String, 
         default: ''
     },
+    projectfor: {
+        type :String,
+        required: [true, 'Project for is required.'],
+    },
+    teamtype:{
+        type: String,
+        enum: ['Individual', 'Team'],
+        default: 'Individual'
+    },
+    teammembers: [{
+        name: { type: String, required: true },
+        role: { type: String, required: true }
+    }],
+    seekingmembers:{
+        type: Boolean, 
+        default: false
+    },
     creator: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -47,6 +64,6 @@ const projectSchema = new Schema({
     }
 }, { timestamps: true }); 
 
-const Project = mongoose.model('project', projectSchema);
+const project = mongoose.model('project', projectSchema); 
 
-module.exports = Project;
+module.exports = project;

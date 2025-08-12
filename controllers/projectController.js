@@ -1,34 +1,48 @@
 const Project = require('../models/project'); 
 const Student = require('../models/student'); 
-//Create a new project
+//create project 
 exports.createProject = async (req, res) => {
     try {
-        const { title, description, technologies, link } = req.body;
-        const creatorId = req.user.id; 
+        const { 
+            title, 
+            description, 
+            technologies, 
+            link, 
+            projectfor, 
+            teamtype, 
+            teammembers, 
+            seekingmembers 
+        } = req.body;
+        
+        const creatorId = req.user.id;
 
-        if (!title || !description) {
-            return res.status(400).json({ message: 'Title and description are required.' });
+        if (!title || !description || !projectfor) {
+            return res.status(400).json({ message: 'Title, description, and project purpose are required.' });
         }
-
         const newProject = new Project({
             title,
             description,
             technologies: technologies || [], 
             link: link || '',
+            projectfor,
+            teamtype,
+            teammembers: teammembers || [],
+            seekingmembers,
             creator: creatorId,
             projectImage: req.file ? req.file.path : '' 
         });
 
         const savedProject = await newProject.save();
 
-         const projectSummary = {
+        const projectSummary = {
             title: savedProject.title,
             description: savedProject.description,
             tags: savedProject.technologies 
         };
 
+    
         await Student.findByIdAndUpdate(creatorId, {
-            $push: { projects: projectSummary._id } 
+            $push: { projects: projectSummary } 
         });
 
         res.status(201).json({ message: 'Project created successfully', project: savedProject });
@@ -39,18 +53,16 @@ exports.createProject = async (req, res) => {
     }
 };
 
-// Get all projects
+//  Get all projects
 exports.getAllProjects = async (req, res) => {
     try {
-        //.populate is  used for disoplayingg all details of the project using the id 
         const projects = await Project.find().populate('creator', 'name institution'); 
         res.status(200).json(projects);
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }
 };
-
-// Get a single project by its ID
+//    Get a single project by its ID
 exports.getProjectById = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id).populate('creator', 'name email profilePicture');
