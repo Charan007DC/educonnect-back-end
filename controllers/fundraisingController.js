@@ -1,4 +1,4 @@
-const FundraisingCampaign = require('../models/fundRaiser');
+const FundraisingCampaign = require('../models/fundRaisingCampaign');
 const Student = require('../models/student');
 // Create a new fundraising campaign
 exports.createCampaign = async (req, res) => {
