@@ -14,7 +14,7 @@ router.post(
 );
 //   Get all fundraising campaigns
 router.get('/', fundraisingController.getAllCampaigns);
-//  Add a donation to a campaign
+//   Add a donation to a campaign
 router.post(
     '/:id/donate',
     verifyStudentToken, // Or a general verifyToken middleware
