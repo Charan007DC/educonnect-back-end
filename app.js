@@ -4,6 +4,11 @@ const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
 
+require('./models/student');
+require('./models/alumni');
+require('./models/project');
+require('./models/fundraisingCampaign');
+
 const studentRoutes = require('./routes/studentRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
