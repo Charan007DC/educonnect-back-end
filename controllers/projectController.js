@@ -11,7 +11,8 @@ exports.createProject = async (req, res) => {
             projectfor, 
             teamtype, 
             teammembers, 
-            seekingmembers 
+            seekingmembers,
+            date
         } = req.body;
         
         const creatorId = req.user.id;
@@ -28,6 +29,7 @@ exports.createProject = async (req, res) => {
             teamtype,
             teammembers: teammembers || [],
             seekingmembers,
+            date,
             creator: creatorId,
             projectImage: req.file ? req.file.path : '' 
         });

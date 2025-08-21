@@ -45,6 +45,11 @@ const projectSchema = new Schema({
         required: true,
         ref: 'student' 
     },
+    date:[{
+        startdate:{ type: Date, required: true },
+        enddate:{ type: Date, required: true }
+
+    }],
     collaborators: [{ 
         collaboratorId: {
             type: Schema.Types.ObjectId,
@@ -54,7 +59,7 @@ const projectSchema = new Schema({
         collaboratorModel: {
             type: String,
             required: true,
-            enum: ['Student', 'Alumni']
+            enum: ['student', 'alumni']
         }
     }],
     status: {
