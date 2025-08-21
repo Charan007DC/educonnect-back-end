@@ -1,8 +1,10 @@
 const Project = require('../models/project'); 
 const Student = require('../models/student'); 
-//create project 
+
+// Create a new project
 exports.createProject = async (req, res) => {
     try {
+        // Destructure all fields from the request body, including the new 'date' field
         const { 
             title, 
             description, 
@@ -12,7 +14,7 @@ exports.createProject = async (req, res) => {
             teamtype, 
             teammembers, 
             seekingmembers,
-            date
+            date 
         } = req.body;
         
         const creatorId = req.user.id;
@@ -20,6 +22,7 @@ exports.createProject = async (req, res) => {
         if (!title || !description || !projectfor) {
             return res.status(400).json({ message: 'Title, description, and project purpose are required.' });
         }
+
         const newProject = new Project({
             title,
             description,
@@ -36,13 +39,14 @@ exports.createProject = async (req, res) => {
 
         const savedProject = await newProject.save();
 
+        // Create a summary object that matches your studentSchema
         const projectSummary = {
             title: savedProject.title,
             description: savedProject.description,
             tags: savedProject.technologies 
         };
 
-    
+        // Push the project summary object to the student's record
         await Student.findByIdAndUpdate(creatorId, {
             $push: { projects: projectSummary } 
         });
@@ -55,16 +59,20 @@ exports.createProject = async (req, res) => {
     }
 };
 
-//  Get all projects
+
+// Get all projects
 exports.getAllProjects = async (req, res) => {
     try {
         const projects = await Project.find().populate('creator', 'name institution'); 
         res.status(200).json(projects);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        // This will print the specific database error to your server logs.
+        console.error('Error fetching all projects:', error); 
+        res.status(500).json({ message: 'Server error while fetching projects.' });
     }
 };
-//    Get a single project by its ID
+
+// Get a single project by its ID
 exports.getProjectById = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id).populate('creator', 'name email profilePicture');
@@ -73,6 +81,7 @@ exports.getProjectById = async (req, res) => {
         }
         res.status(200).json(project);
     } catch (error) {
+        console.error(`Error fetching project by ID (${req.params.id}):`, error);
         res.status(500).json({ message: 'Server error' });
     }
 };
