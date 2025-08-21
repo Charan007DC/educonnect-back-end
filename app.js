@@ -7,14 +7,14 @@ dotenv.config();
 require('./models/student');
 require('./models/alumni');
 require('./models/project');
-require('./models/fundraisingCampaign');
+require('./models/fundRaisingCampaign');
 
 const studentRoutes = require('./routes/studentRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/search');
 const projectRoutes = require('./routes/projectRoutes');
-const fundraisingRoutes = require('./routes/fundraisingRoutes');
+const fundraisingRoutes = require('./routes/fundRaisingRoutes');
 const app = express();
 // --- START OF CORRECTIONS ---
 const allowedOrigins = [
