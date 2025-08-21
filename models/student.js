@@ -34,4 +34,4 @@ const studentSchema = new mongoose.Schema({
   lookingFor: [String], // e.g., ['ML mentorship', 'Open Source']
 }, { timestamps: true });
 
-module.exports = mongoose.model('student', studentSchema);
+module.exports = mongoose.model('Student', studentSchema);
