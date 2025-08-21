@@ -14,7 +14,7 @@ const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/search');
 const projectRoutes = require('./routes/projectRoutes');
-const fundraisingRoutes = require('./routes/fundRaisingRoutes');
+const fundraisingRoutes = require('./routes/fundraisingRoutes');
 const app = express();
 // --- START OF CORRECTIONS ---
 const allowedOrigins = [
