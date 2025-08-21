@@ -48,7 +48,6 @@ const projectSchema = new Schema({
     date:[{
         startdate:{ type: Date, required: true },
         enddate:{ type: Date, required: true }
-
     }],
     collaborators: [{ 
         collaboratorId: {
@@ -59,7 +58,7 @@ const projectSchema = new Schema({
         collaboratorModel: {
             type: String,
             required: true,
-            enum: ['student', 'alumni']
+            enum: ['student', 'alumni'] 
         }
     }],
     status: {
@@ -69,6 +68,6 @@ const projectSchema = new Schema({
     }
 }, { timestamps: true }); 
 
-const project = mongoose.model('project', projectSchema); 
+const Project = mongoose.model('project', projectSchema); 
 
-module.exports = project;
+module.exports = Project;
