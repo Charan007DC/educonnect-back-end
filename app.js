@@ -25,7 +25,7 @@ const app = express();
 
 // --- 3. CORS and Middleware Setup ---
 const allowedOrigins = [
-  'http://localhost:3000',
+  'http://localhost:5175',
   'http://localhost:5173', // Vite's default port
   process.env.FRONTEND_URL // Your deployed frontend URL
 ];
