@@ -3,8 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cloudinary = require('cloudinary').v2;
 const streamifier = require('streamifier');
-
-// Register a student
+//register student
 exports.registerStudent = async (req, res) => {
   const { name, email, password, graduationYear, institution, department } = req.body;
   if (!name || !email || !password || !graduationYear || !institution || !department) {
@@ -45,12 +44,9 @@ exports.registerStudent = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
-
-// Login a student
+//login student
 exports.loginStudent = async (req, res) => {
- 
     console.log('Backend received login request for:', req.body);
-
     const { email, password } = req.body;
 
     try {
@@ -64,8 +60,13 @@ exports.loginStudent = async (req, res) => {
             return res.status(400).json({ message: 'Invalid email or password' });
         }
 
+        const payload = {
+            id: student._id,
+            role: student.role 
+        };
+
         const token = jwt.sign(
-            { id: student._id },
+            payload,
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
@@ -88,11 +89,9 @@ exports.loginStudent = async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 };
-
-// Update profile picture
+//update profile picture
 exports.updateProfilePicture = async (req, res) => {
   try {
-    // Corrected to use req.user.id to match the JWT payload
     const studentId = req.user.id; 
     const file = req.file;
 
@@ -102,7 +101,6 @@ exports.updateProfilePicture = async (req, res) => {
 
     const imageUrl = file.path;
     
-    // You don't need to require the model again here
     const student = await Student.findByIdAndUpdate(
       studentId,
       { profilePicture: imageUrl },
@@ -119,11 +117,9 @@ exports.updateProfilePicture = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-// Get student profile 
+//get student profile
 exports.getStudentProfile = async (req, res) => {
   try {
-    // Corrected to use req.user.id
     const studentId = req.user.id; 
 
     const student = await Student.findById(studentId).select('-password');
@@ -138,8 +134,7 @@ exports.getStudentProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-// Update student profile
+//update student profile
 exports.updateStudentProfile = async (req, res) => {
   try {
     const allowedFields = [
@@ -159,7 +154,7 @@ exports.updateStudentProfile = async (req, res) => {
     }
 
     const updatedStudent = await Student.findByIdAndUpdate(
-      req.user.id, // Corrected to use req.user.id
+      req.user.id,
       updates,
       { new: true }
     ).select('-password'); 
@@ -176,7 +171,7 @@ exports.updateStudentProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
-
+//get student dashboard details
 exports.getStudentDashboardDetails = async (req, res) => {
   try {
     const student = await Student.findById(req.user.id).select('name');

@@ -4,21 +4,18 @@ const Alumni = require("../models/alumni");
 
 // Alumni Registration
 exports.registerAlumni = async (req, res) => {
-  const { name, email, password ,graduationYear,institution,department } = req.body;
-    if (!name || !email || !password || !graduationYear || !institution || !department) {
-  return res.status(400).json({ message: 'All fields are required' }); 
+  const { name, email, password, graduationYear, institution, department } = req.body;
+  if (!name || !email || !password || !graduationYear || !institution || !department) {
+    return res.status(400).json({ message: 'All fields are required' }); 
   }
   try {    
-    // Check if email already exists
     const existingAlumni = await Alumni.findOne({ email });
     if (existingAlumni) {
       return res.status(400).json({ message: "Email already registered" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new alumni
     const alumni = new Alumni({
       name,
       email,
@@ -26,7 +23,6 @@ exports.registerAlumni = async (req, res) => {
       graduationYear,
       department,
       institution,
-      // Default values for other fields
       currentCompany: '',
       jobTitle: '',
       about: '',
@@ -36,8 +32,6 @@ exports.registerAlumni = async (req, res) => {
       skills: [],
       projects: [],
       lookingFor: [],
-      
-
     });
 
     await alumni.save();
@@ -61,15 +55,30 @@ exports.loginAlumni = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials" });
     }
+    
+    // The role must be capitalized to match the verifyAlumniToken middleware.
+    const payload = { 
+        id: alumni._id, 
+        role: "Alumni" 
+    };
 
-    // Generate token
     const token = jwt.sign(
-      { id: alumni._id, role: "alumni" },
+      payload,
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
-
-    res.status(200).json({ token, alumni });
+    
+    // Send a curated object for security
+    res.status(200).json({ 
+        message: "Login successful",
+        token, 
+        alumni: {
+            id: alumni._id,
+            name: alumni.name,
+            email: alumni.email,
+            role: "Alumni"
+        }
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

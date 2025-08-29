@@ -2,26 +2,61 @@ const Admin = require('../models/admin');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+//register admin
+exports.registerAdmin = async (req, res) => {
+    try {
+        const { username, password } = req.body;
+
+        if (!username || !password) {
+            return res.status(400).json({ message: 'Please provide username and password.' });
+        }
+
+        const existingAdmin = await Admin.findOne({ username });
+        if (existingAdmin) {
+            return res.status(400).json({ message: 'Admin with this username already exists.' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newAdmin = new Admin({
+            username,
+            password: hashedPassword
+        });
+
+        await newAdmin.save();
+
+        res.status(201).json({ message: 'Admin registered successfully.' });
+
+    } catch (error) {
+        console.error("Error registering admin:", error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 // Login Admin using username and password
 exports.loginAdmin = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Find admin by username
     const admin = await Admin.findOne({ username });
     if (!admin) {
       return res.status(404).json({ message: 'Admin not found' });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    // Generate JWT token
+    const payload = { 
+        id: admin._id, 
+        role: 'Admin' 
+    };
+
     const token = jwt.sign(
-      { id: admin._id, role: 'admin' }, // Assuming role is always admin
+      payload,
       process.env.JWT_SECRET,
       { expiresIn: '1d' }
     );
@@ -31,7 +66,7 @@ exports.loginAdmin = async (req, res) => {
       token,
       admin: {
         username: admin.username,
-        role: 'admin'
+        role: 'Admin' 
       }
     });
 
@@ -39,9 +74,9 @@ exports.loginAdmin = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 exports.getAdminDashboard = async (req, res) => {
   try {
-    // Dummy data — Replace with DB queries if needed
     const dashboardData = {
       totalUsers: 120,
       activeAlumni: 45,

@@ -4,61 +4,59 @@ const path = require('path');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// --- 1. IMPORTANT: Register all Mongoose Models FIRST ---
-// This ensures that Mongoose knows about each schema before any other part of the app
-// tries to use them (e.g., in a controller with .populate()).
+// Register all your Mongoose models
 require('./models/student');
-require('./models/alumni'); // Assuming you have an alumni.js model file
+require('./models/alumni'); 
 require('./models/project');
-require('./models/fundRaisingCampaign'); // Assuming you have this model file
-// Add any other models you have here...
+require('./models/fundRaisingCampaign');
+require('./models/mentorshipRequest');
+require('./models/chatSession');
 
-// --- 2. Import all Route Files ---
+// Import all your route files
 const studentRoutes = require('./routes/studentRoutes');
 const alumniRoutes = require('./routes/alumniRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const searchRoutes = require('./routes/search');
 const projectRoutes = require('./routes/projectRoutes');
-const fundraisingRoutes = require('./routes/fundraisingRoutes');
+const fundraisingRoutes = require('./routes/fundraisingRoutes'); 
+const chatRoutes = require('./routes/chatRoutes');
+// Corrected the path to point to the correct routes file
+const mentorshipRoutes = require('./routes/mentorshipRequest'); 
 
 const app = express();
 
-// --- 3. CORS and Middleware Setup ---
+// CORS and Middleware Setup
 const allowedOrigins = [
-  'http://localhost:5175',
-  'http://localhost:5173', // Vite's default port
-  process.env.FRONTEND_URL // Your deployed frontend URL
+ 'http://localhost:5175',
+'http://localhost:5173',
+process.env.FRONTEND_URL
 ];
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('This origin is not allowed by CORS policy.'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'],
-  credentials: true
+ origin: (origin, callback) => {
+ if (!origin || allowedOrigins.includes(origin)) {
+callback(null, true);
+ } else {
+ callback(new Error('This origin is not allowed by CORS policy.'));
+ }
+ },
+ methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD'],
+credentials: true
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// --- 4. API Routes ---
-app.get('/', (req, res) => {
-  res.status(200).send('Welcome to the EduConnect API. The app is running!');
-});
-
+// API Routes
 app.use('/api/student', studentRoutes);
 app.use('/api/alumni', alumniRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/fundraising', fundraisingRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/mentorship', mentorshipRoutes);
 
-// Static folder for uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// --- 5. Export the App ---
 module.exports = app;
